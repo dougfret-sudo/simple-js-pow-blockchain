@@ -10,3 +10,8 @@ In this blockchain, adding a new block isn't free. The Mining Chain ensures secu
 The Challenge: To add a block, a miner must find a hash that starts with a specific number of zeros (the difficulty).
 The Nonce: Since the block's data is fixed, we use a nonce (number used once). We increment this number thousands of times and re-hash until the "target" is met.
 Security: If an attacker changes data in an old block, its hash changes. Because every subsequent block contains the previous hash, the entire chain becomes invalid unless the attacker re-mines every single following block—an impossible task as the chain grows.
+[ BLOCK 0 (Genesis) ]        [ BLOCK 1 ]                [ BLOCK 2 ]
+
+| Hash: 0000abc...  | <--- | Prev Hash: 0000abc... | <--- | Prev Hash: 0000xyz... |
+| Data: "Genesis"   |      | Data: "First Trans"   |      | Data: "Second Trans"  |
+| Nonce: 45021      |      | Nonce: 88231          |      | Nonce: 12093          |

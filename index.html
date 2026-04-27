@@ -1,49 +1,64 @@
-async function mineNewBlock() {
-    const btn = document.getElementById('mineBtn');
-    btn.disabled = true; // Disable so you can't double-mine
-    
-    const index = chain.length;
-    const prevHash = chain[chain.length - 1].hash;
-    let nonce = 0;
-    let hash = "";
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blockchain Miner</title>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; padding: 20px; }
+        .block { background: #1e1e1e; border: 2px solid #333; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .mining { border-color: #f1c40f; }
+        .success { border-color: #00ff00; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        pre { background: #000; padding: 10px; color: #00ff00; word-break: break-all; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>⛓️ Blockchain Miner</h1>
+    <button id="mineBtn">Mine New Block</button>
+    <div id="chain"></div>
 
-    // Create the visual block immediately
-    const display = document.createElement('div');
-    display.className = "block mining";
-    document.getElementById('chain').prepend(display);
-
-    // --- THE MINING LOOP ---
-    while (true) {
-        nonce++;
-        hash = await sha256(index + prevHash + nonce);
-        
-        // Update UI every 100 tries so it doesn't lag
-        if (nonce % 100 === 0) {
-            display.innerHTML = `
-                <h3>⛏️ Mining Block #${index}...</h3>
-                <p><strong>Nonce:</strong> ${nonce}</p>
-                <pre style="word-break: break-all;">${hash}</pre>
-            `;
-            // This is the "Magic" line that prevents the browser from freezing
-            await new Promise(resolve => setTimeout(resolve, 0));
+    <script>
+        // Real SHA-256 Hashing for the browser
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Check if we found a valid hash (starts with 0000)
-        if (hash.startsWith("0000")) {
-            break; 
-        }
-    }
+        let chain = [{ index: 0, hash: "00000000000000000000000000000000", nonce: 0 }];
 
-    // Success! Update block style
-    display.className = "block";
-    display.style.borderColor = "#00ff00";
-    display.innerHTML = `
-        <h3>✅ Block #${index} Mined!</h3>
-        <p><strong>Final Nonce:</strong> ${nonce}</p>
-        <p><strong>Hash:</strong></p>
-        <pre style="word-break: break-all;">${hash}</pre>
-    `;
-    
-    chain.push({ index, hash, nonce });
-    btn.disabled = false;
-}
+        async function mineNewBlock() {
+            const btn = document.getElementById('mineBtn');
+            btn.disabled = true;
+            
+            const index = chain.length;
+            const prevHash = chain[chain.length - 1].hash;
+            let nonce = 0;
+            let hash = "";
+
+            const display = document.createElement('div');
+            display.className = "block mining";
+            document.getElementById('chain').prepend(display);
+
+            while (true) {
+                nonce++;
+                hash = await sha256(index + prevHash + nonce);
+                
+                if (nonce % 100 === 0) {
+                    display.innerHTML = `<h3>⛏️ Mining Block #${index}...</h3><p>Nonce: ${nonce}</p><pre>${hash}</pre>`;
+                    await new Promise(r => setTimeout(r, 0)); // Prevents UI freeze
+                }
+
+                if (hash.startsWith("0000")) break;
+            }
+
+            display.className = "block success";
+            display.innerHTML = `<h3>✅ Block #${index} Mined!</h3><p>Final Nonce: ${nonce}</p><pre>${hash}</pre>`;
+            
+            chain.push({ index, hash, nonce });
+            btn.disabled = false;
+        }
+
+        document.getElementById('mineBtn').onclick = mineNewBlock;
+    </script>
+</body>
+</html>

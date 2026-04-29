@@ -23,7 +23,7 @@ class Block {
             this.nonce++;
             this.hash = this.calculateHash();
         }
-        console.log(`✅ Block Mined! Hash: ${this.hash}`);
+        console.log(`✅ Block ${this.index} Mined! Hash: ${this.hash} (Nonce: ${this.nonce})`);
     }
 }
 
@@ -46,25 +46,17 @@ class Blockchain {
         newBlock.mineBlock(this.difficulty);
         this.chain.push(newBlock);
     }
-
-    isChainValid() {
-        for (let i = 1; i < this.chain.length; i++) {
-            const currentBlock = this.chain[i];
-            const previousBlock = this.chain[i - 1];
-            if (currentBlock.hash !== currentBlock.calculateHash()) return false;
-            if (currentBlock.previousHash !== previousBlock.hash) return false;
-        }
-        return true;
-    }
 }
 
-// Demo
+// --- RUNNING THE PROJECT ---
 const myCrypto = new Blockchain();
-console.log("Mining block 1...");
-myCrypto.addBlock(new Block(1, "20/04/2026", { amount: 50 }));
-console.log("Is blockchain valid? " + myCrypto.isChainValid());
-// Let's mess with the data after it's mined
-myCrypto.chain[1].data = { amount: 1000000 }; 
 
-// Check if the chain catches the fraud
-console.log("Is blockchain valid after tampering? " + myCrypto.isChainValid());
+console.log("Starting the miner...");
+
+console.log("\n--- Mining block 1 ---");
+myCrypto.addBlock(new Block(1, "20/04/2026", { amount: 50 }));
+
+console.log("\n--- Mining block 2 ---");
+myCrypto.addBlock(new Block(2, "21/04/2026", { amount: 100 }));
+
+console.log("\n🚀 Blockchain successful! Check those leading zeros.");

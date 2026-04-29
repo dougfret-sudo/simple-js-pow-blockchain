@@ -63,3 +63,8 @@ const myCrypto = new Blockchain();
 console.log("Mining block 1...");
 myCrypto.addBlock(new Block(1, "20/04/2026", { amount: 50 }));
 console.log("Is blockchain valid? " + myCrypto.isChainValid());
+// Let's mess with the data after it's mined
+myCrypto.chain[1].data = { amount: 1000000 }; 
+
+// Check if the chain catches the fraud
+console.log("Is blockchain valid after tampering? " + myCrypto.isChainValid());

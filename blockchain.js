@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { performance } = require('perf_hooks');
 
 class Block {
     constructor(index, timestamp, data, previousHash = '') {
@@ -19,18 +20,33 @@ class Block {
 
     mineBlock(difficulty) {
         const target = Array(difficulty + 1).join("0");
+        const startTime = performance.now(); // Start the stopwatch
+        let hashAttempts = 0;
+
+        console.log(`⛏️  Mining Block ${this.index} (Difficulty: ${difficulty})...`);
+
         while (this.hash.substring(0, difficulty) !== target) {
             this.nonce++;
+            hashAttempts++;
             this.hash = this.calculateHash();
         }
-        console.log(`✅ Block ${this.index} Mined! Hash: ${this.hash} (Nonce: ${this.nonce})`);
+
+        const endTime = performance.now(); // Stop the stopwatch
+        const durationInSeconds = (endTime - startTime) / 1000;
+        const hps = (hashAttempts / durationInSeconds).toFixed(2);
+
+        console.log(`✅ Block Mined!`);
+        console.log(`🔗 Hash: ${this.hash}`);
+        console.log(`⏱️  Time: ${durationInSeconds.toFixed(3)}s`);
+        console.log(`🔢 Nonce: ${this.nonce}`);
+        console.log(`🚀 Speed: ${hps} Hashes/Sec (HPS)\n`);
     }
 }
 
 class Blockchain {
     constructor() {
         this.chain = [this.createGenesisBlock()];
-        this.difficulty = 5; 
+        this.difficulty = 5; // Set this to 6 for a real challenge!
     }
 
     createGenesisBlock() {
@@ -46,17 +62,25 @@ class Blockchain {
         newBlock.mineBlock(this.difficulty);
         this.chain.push(newBlock);
     }
+
+    isChainValid() {
+        for (let i = 1; i < this.chain.length; i++) {
+            const currentBlock = this.chain[i];
+            const previousBlock = this.chain[i - 1];
+            if (currentBlock.hash !== currentBlock.calculateHash()) return false;
+            if (currentBlock.previousHash !== previousBlock.hash) return false;
+        }
+        return true;
+    }
 }
 
-// --- RUNNING THE PROJECT ---
+// --- RUNNING THE RESEARCH DEMO ---
 const myCrypto = new Blockchain();
 
-console.log("Starting the miner...");
-
-console.log("\n--- Mining block 1 ---");
+// Block 1
 myCrypto.addBlock(new Block(1, "20/04/2026", { amount: 50 }));
 
-console.log("\n--- Mining block 2 ---");
+// Block 2
 myCrypto.addBlock(new Block(2, "21/04/2026", { amount: 100 }));
 
-console.log("\n🚀 Blockchain successful! Check those leading zeros.");
+console.log(`Is blockchain valid? ${myCrypto.isChainValid() ? "YES" : "NO"}`);

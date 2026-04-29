@@ -20,7 +20,7 @@ class Block {
 
     mineBlock(difficulty) {
         const target = Array(difficulty + 1).join("0");
-        const startTime = performance.now(); // Start the stopwatch
+        const startTime = performance.now(); 
         let hashAttempts = 0;
 
         console.log(`⛏️  Mining Block ${this.index} (Difficulty: ${difficulty})...`);
@@ -29,9 +29,14 @@ class Block {
             this.nonce++;
             hashAttempts++;
             this.hash = this.calculateHash();
+
+            // --- HEARTBEAT: This shows you progress while it works ---
+            if (this.nonce % 500000 === 0) {
+                console.log(`   Still searching... Nonce: ${this.nonce.toLocaleString()}`);
+            }
         }
 
-        const endTime = performance.now(); // Stop the stopwatch
+        const endTime = performance.now(); 
         const durationInSeconds = (endTime - startTime) / 1000;
         const hps = (hashAttempts / durationInSeconds).toFixed(2);
 
@@ -46,7 +51,7 @@ class Block {
 class Blockchain {
     constructor() {
         this.chain = [this.createGenesisBlock()];
-        this.difficulty = 5; // Set this to 6 for a real challenge!
+        this.difficulty = 5; 
     }
 
     createGenesisBlock() {
@@ -74,13 +79,8 @@ class Blockchain {
     }
 }
 
-// --- RUNNING THE RESEARCH DEMO ---
 const myCrypto = new Blockchain();
-
-// Block 1
 myCrypto.addBlock(new Block(1, "20/04/2026", { amount: 50 }));
-
-// Block 2
 myCrypto.addBlock(new Block(2, "21/04/2026", { amount: 100 }));
 
 console.log(`Is blockchain valid? ${myCrypto.isChainValid() ? "YES" : "NO"}`);
